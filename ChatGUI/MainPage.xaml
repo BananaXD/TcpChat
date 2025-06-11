@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="ChatGUI.MainPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Encrypted Chat">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Connection Status -->
+        <StackLayout Grid.Row="0" Orientation="Horizontal" Padding="10" BackgroundColor="LightGray">
+            <Label x:Name="ConnectionStatusLabel" Text="Disconnected" FontAttributes="Bold" />
+            <Button x:Name="ConnectButton" Text="Connect" Clicked="OnConnectClicked" />
+            <Button x:Name="DisconnectButton" Text="Disconnect" Clicked="OnDisconnectClicked" IsEnabled="False" />
+        </StackLayout>
+
+        <!-- Chat Messages -->
+        <ScrollView Grid.Row="1" x:Name="ChatScrollView">
+            <StackLayout x:Name="MessagesContainer" Padding="10" Spacing="5" />
+        </ScrollView>
+
+        <!-- File Attachment Area -->
+        <StackLayout Grid.Row="2" Orientation="Horizontal" Padding="10" BackgroundColor="LightBlue">
+            <Button Text="Attach File" Clicked="OnAttachFileClicked" />
+            <Button Text="Attach Photo" Clicked="OnAttachPhotoClicked" />
+            <Label x:Name="AttachmentLabel" Text="" FontSize="12" />
+            <Button x:Name="ClearAttachmentButton" Text="Clear" Clicked="OnClearAttachmentClicked" IsVisible="False" />
+        </StackLayout>
+
+        <!-- Message Input -->
+        <StackLayout Grid.Row="3" Orientation="Horizontal" Padding="10">
+            <Entry x:Name="MessageEntry" Placeholder="Type your message..." HorizontalOptions="FillAndExpand" />
+            <Button Text="Send" Clicked="OnSendClicked" />
+        </StackLayout>
+    </Grid>
+
+</ContentPage>
