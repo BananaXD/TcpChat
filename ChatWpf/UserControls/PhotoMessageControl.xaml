@@ -14,7 +14,7 @@
 
             <Border CornerRadius="8" ClipToBounds="True">
                 <Image Source="{Binding ImageSource}" 
-                     MaxHeight="200" Stretch="UniformToFill"/>
+                     MaxHeight="200" Stretch="Uniform"/>
             </Border>
 
             <TextBlock Text="{Binding FileName}" 
