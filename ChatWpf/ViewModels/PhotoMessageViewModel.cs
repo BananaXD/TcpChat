@@ -1,7 +1,9 @@
 ﻿using ChatWpf;
+using Client;
 using SharedModels;
 using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace ChatWpf
@@ -10,8 +12,8 @@ namespace ChatWpf
     {
         private BitmapImage _imageSource;
 
-        public string FileName => _packet.FileName;
-        public long FileSize => _packet.FileSize.Value;
+        public string? FileName => _message.Packet.FileName;
+        public long FileSize => _message.Packet.FileSize.Value;
         public string FileSizeFormatted => FormatFileSize(FileSize);
 
         public BitmapImage ImageSource
@@ -24,37 +26,33 @@ namespace ChatWpf
             }
         }
 
-        public PhotoMessageViewModel(MessagePacket packet, bool isOwnMessage = false)
-            : base(packet, isOwnMessage)
+        public PhotoMessageViewModel(MessageReceivedEventArgs message)
+            : base(message)
         {
             LoadImage();
         }
 
-        public PhotoMessageViewModel(string filePath, string senderId, bool isOwnMessage = true)
-            : base(new MessagePacket
-            {
-                SenderId = senderId,
-                FileName = Path.GetFileName(filePath),
-                FileSize = new FileInfo(filePath).Length
-            }, isOwnMessage)
-        {
-            LoadImageFromFile(filePath);
-        }
-
-        private void LoadImage()
+        public void LoadImage()
         {
             try
             {
-                if (_packet.DecryptedFileData != null)
+                if (_message.DecryptedFileData != null)
                 {
                     var bitmap = new BitmapImage();
                     bitmap.BeginInit();
-                    bitmap.StreamSource = new MemoryStream(_packet.DecryptedFileData);
+                    bitmap.StreamSource = new MemoryStream(_message.DecryptedFileData);
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     bitmap.EndInit();
                     bitmap.Freeze();
                     ImageSource = bitmap;
                 }
+                // Request download from server
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    if (Application.Current.MainWindow is MainWindow mainWindow) {
+                        mainWindow.RequestFileDownload(Message.Packet.MessageId);
+                    }
+                });
             }
             catch (Exception ex)
             {

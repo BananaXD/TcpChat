@@ -1,4 +1,5 @@
 ﻿using ChatWpf;
+using Client;
 using SharedModels;
 
 namespace ChatWpf
@@ -7,16 +8,10 @@ namespace ChatWpf
     {
         public string Content { get; }
 
-        public TextMessageViewModel(MessagePacket packet, bool isOwnMessage = false)
-            : base(packet, isOwnMessage)
+        public TextMessageViewModel(MessageReceivedEventArgs message)
+            : base(message)
         {
-            Content = packet.DecryptedContent ?? "[Encrypted Message]";
-        }
-
-        public TextMessageViewModel(string content, string senderId, bool isOwnMessage = true)
-            : base(new MessagePacket { SenderId = senderId }, isOwnMessage)
-        {
-            Content = content;
+            Content = message.DecryptedContent ?? "[Encrypted Message]";
         }
     }
 }

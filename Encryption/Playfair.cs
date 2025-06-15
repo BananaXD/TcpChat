@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace EncryptionLibrary {
     public class PlayfairEncryption {
@@ -54,7 +55,10 @@ namespace EncryptionLibrary {
                 byte second = i + 1 < processedData.Count ? processedData[i + 1] : (byte)0;
 
                 var encryptedPair = EncryptPair(first, second);
-                result.AddRange(encryptedPair);
+                if (i + 1 < processedData.Count)
+                    result.AddRange(encryptedPair);
+                else
+                    result.Add(encryptedPair[0]);
             }
 
             return result.ToArray();
@@ -69,11 +73,26 @@ namespace EncryptionLibrary {
                 byte second = i + 1 < encryptedData.Length ? encryptedData[i + 1] : (byte)0;
 
                 var decryptedPair = DecryptPair(first, second);
-                result.AddRange(decryptedPair);
+                if (i + 1 < encryptedData.Length)
+                    result.AddRange(decryptedPair);
+                else
+                    result.Add(decryptedPair[0]);
             }
 
             return RestoreDuplicates(result).ToArray();
         }
+
+        public string Encrypt(string plaintext) {
+            byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
+            byte[] encryptedBytes = Encrypt(plaintextBytes);
+            return Convert.ToBase64String(encryptedBytes);
+        }
+        public string Decrypt(string encryptedText) {
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+            byte[] decryptedBytes = Decrypt(encryptedBytes);
+            return Encoding.UTF8.GetString(decryptedBytes);
+        }
+
 
         private List<byte> HandleDuplicates(byte[] data) {
             var result = new List<byte>();

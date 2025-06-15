@@ -16,11 +16,11 @@
         <SolidColorBrush x:Key="SurfaceBrush" Color="#FF2D2D30"/>
         <SolidColorBrush x:Key="TextBrush" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="SubtleBrush" Color="#FF3E3E42"/>
-
+        
         <!-- Button Style -->
         <Style x:Key="ModernButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="16,8"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -55,7 +55,7 @@
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="BorderBrush" Value="{StaticResource SubtleBrush}"/>
-            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Padding" Value="6,8"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -71,7 +71,11 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
+        
+        <Style x:Key="WindowControlButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
         <!-- Add converters -->
         <conv:BoolToAlignmentConverter x:Key="BoolToAlignmentConverter"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -123,11 +127,11 @@
                     <StackPanel Orientation="Horizontal" 
                               HorizontalAlignment="Right" Margin="8,0">
                         <Button Content="─" Width="30" Height="30" 
-                              Click="Minimize_Click" Style="{StaticResource ModernButton}"/>
+                              Click="Minimize_Click" Style="{StaticResource WindowControlButton}"/>
                         <Button Content="□" Width="30" Height="30" Margin="4,0"
-                              Click="Maximize_Click" Style="{StaticResource ModernButton}"/>
+                              Click="Maximize_Click" Style="{StaticResource WindowControlButton}"/>
                         <Button Content="✕" Width="30" Height="30"
-                              Click="Close_Click" Style="{StaticResource ModernButton}"/>
+                              Click="Close_Click" Style="{StaticResource WindowControlButton}"/>
                     </StackPanel>
                 </Grid>
             </Border>

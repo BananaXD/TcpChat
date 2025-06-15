@@ -1,28 +1,30 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Client;
 using SharedModels;
 
 namespace ChatWpf
 {
     public abstract class MessageViewModelBase : INotifyPropertyChanged
     {
-        protected MessagePacket _packet;
+        protected MessageReceivedEventArgs _message;
+        public MessageReceivedEventArgs Message { get => _message; }
 
-        public string SenderId => _packet.SenderId;
-        public string SenderName => _packet.SenderId.Split('_')[0];
+        public string? SenderId => _message.Packet.SenderId;
+        public string? SenderName => _message.Packet.SenderId?.Split('_')[0];
         public DateTime Timestamp { get; }
         public string TimestampFormatted => Timestamp.ToString("HH:mm");
         public bool IsOwnMessage { get; }
 
-        protected MessageViewModelBase(MessagePacket packet, bool isOwnMessage = false)
+        protected MessageViewModelBase(MessageReceivedEventArgs message)
         {
-            _packet = packet;
+            _message = message;
             Timestamp = DateTime.Now;
-            IsOwnMessage = isOwnMessage;
+            IsOwnMessage = message.IsOwnMessage;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

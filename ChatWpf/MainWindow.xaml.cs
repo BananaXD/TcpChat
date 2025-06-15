@@ -1,4 +1,5 @@
 ﻿using ChatWpf;
+using Client;
 using Microsoft.Win32;
 using SharedModels;
 using System;
@@ -27,14 +28,17 @@ namespace ChatWpf
         private void InitializeChatClient()
         {
             _chatClient = new ChatClient();
-
-            // Subscribe to events (you'll need to add these to your ChatClient)
-            _chatClient.Connected += OnConnected;
-            _chatClient.Disconnected += OnDisconnected;
+            _chatClient.ConnectionStatusChanged += OnConnectionStatusChanged;
             _chatClient.MessageReceived += OnMessageReceived;
             _chatClient.KeyExchangeCompleted += OnKeyExchangeCompleted;
+            //_chatClient.FileTransferProgress += OnFileTransferProgress;
 
             Loaded += async (s, e) => await StartChatClient();
+        }
+
+        private void OnConnectionStatusChanged(object? sender, ConnectionStatusEventArgs e) {
+            _viewModel.ConnectionStatus = e.Message;
+            _viewModel.IsConnected = e.IsConnected;
         }
 
         private async Task StartChatClient()
@@ -42,7 +46,7 @@ namespace ChatWpf
             try
             {
                 _viewModel.ConnectionStatus = "Connecting...";
-                await _chatClient.StartAsync();
+                await _chatClient.ConnectAsync();
             }
             catch (Exception ex)
             {
@@ -52,25 +56,7 @@ namespace ChatWpf
             }
         }
 
-        private void OnConnected()
-        {
-            Dispatcher.Invoke(() =>
-            {
-                _viewModel.IsConnected = true;
-                _viewModel.ConnectionStatus = "Connected - Waiting for encryption...";
-            });
-        }
-
-        private void OnDisconnected()
-        {
-            Dispatcher.Invoke(() =>
-            {
-                _viewModel.IsConnected = false;
-                _viewModel.ConnectionStatus = "Disconnected";
-            });
-        }
-
-        private void OnKeyExchangeCompleted()
+        private void OnKeyExchangeCompleted(object o, EventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
@@ -78,15 +64,15 @@ namespace ChatWpf
             });
         }
 
-        private void OnMessageReceived(MessagePacket packet)
+        private void OnMessageReceived(object o, MessageReceivedEventArgs message)
         {
             Dispatcher.Invoke(() =>
             {
-                MessageViewModelBase messageViewModel = packet.Type switch
+                MessageViewModelBase? messageViewModel = message.Packet.Type switch
                 {
-                    MessageType.Text => new TextMessageViewModel(packet),
-                    MessageType.Photo => new PhotoMessageViewModel(packet),
-                    MessageType.File => new FileMessageViewModel(packet),
+                    MessageType.Text => new TextMessageViewModel(message),
+                    MessageType.Photo => new PhotoMessageViewModel(message),
+                    MessageType.File => new FileMessageViewModel(message),
                     _ => null
                 };
 
@@ -94,6 +80,23 @@ namespace ChatWpf
                 {
                     _viewModel.Messages.Add(messageViewModel);
                     ChatScrollViewer.ScrollToEnd();
+                }
+
+                switch (message.Packet.Type) {
+                    case MessageType.Photo:
+                    case MessageType.FileDownloadResponse:
+
+                        // find viewmodel with same MessageId
+                        MessageViewModelBase? viewmodel = _viewModel.Messages.FirstOrDefault(m => m.Message.Packet.MessageId == message.Packet.MessageId);
+                        if (viewmodel is FileMessageViewModel fileMessage) {
+                            viewmodel.Message.DecryptedFileData = message.DecryptedFileData;
+                        }
+                        else if (viewmodel is PhotoMessageViewModel photoMessage) {
+                            photoMessage.Message.DecryptedFileData = message.DecryptedFileData;
+                            photoMessage.LoadImage(); // Reload image after decryption
+                        }
+
+                    break;
                 }
             });
         }
@@ -120,8 +123,9 @@ namespace ChatWpf
             try
             {
                 // Add to UI immediately
-                var ownMessage = new TextMessageViewModel(message, _chatClient.ClientId, true);
-                _viewModel.Messages.Add(ownMessage);
+                // Client will send the message to the event.
+                // var ownMessage = new TextMessageViewModel(message, _chatClient.ClientId, true);
+                // _viewModel.Messages.Add(ownMessage);
 
                 // Send to server
                 await _chatClient.SendTextMessageAsync(message);
@@ -148,10 +152,6 @@ namespace ChatWpf
             {
                 try
                 {
-                    // Add to UI
-                    var fileMessage = new FileMessageViewModel(dialog.FileName, _chatClient.ClientId, true);
-                    _viewModel.Messages.Add(fileMessage);
-
                     // Send file
                     await _chatClient.SendFileAsync(dialog.FileName, MessageType.File);
                     ChatScrollViewer.ScrollToEnd();
@@ -177,10 +177,6 @@ namespace ChatWpf
             {
                 try
                 {
-                    // Add to UI
-                    var photoMessage = new PhotoMessageViewModel(dialog.FileName, _chatClient.ClientId, true);
-                    _viewModel.Messages.Add(photoMessage);
-
                     // Send photo
                     await _chatClient.SendFileAsync(dialog.FileName, MessageType.Photo);
                     ChatScrollViewer.ScrollToEnd();
@@ -225,13 +221,13 @@ namespace ChatWpf
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            _chatClient?.Disconnect();
+            _chatClient?.DisconnectAsync().Wait();
             Close();
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            _chatClient?.Disconnect();
+            _chatClient?.DisconnectAsync().Wait();
             base.OnClosed(e);
         }
     }
