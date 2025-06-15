@@ -4,15 +4,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ChatMaui"
              xmlns:templates="clr-namespace:ChatMaui.Templates"
+             xmlns:vm="clr-namespace:ChatMaui.ViewModels"
              Title="T3 Chat"
              BackgroundColor="#1E1E1E">
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <templates:MessageTemplates />
-            </ResourceDictionary.MergedDictionaries>
-            
+           
             <Color x:Key="PrimaryColor">#0078D4</Color>
             <Color x:Key="SecondaryColor">#106EBE</Color>
             <Color x:Key="BackgroundColor">#1E1E1E</Color>
@@ -35,11 +33,92 @@
                 <Setter Property="FontAttributes" Value="Bold" />
             </Style>
 
+            <!-- Text Message Template -->
+            <DataTemplate x:Key="TextMessageTemplate" x:DataType="vm:TextMessageViewModel">
+                <Frame Style="{StaticResource MessageBubbleStyle}" MaximumWidthRequest="300">
+                    <Frame.Triggers>
+                        <DataTrigger TargetType="Frame" Binding="{Binding IsOwnMessage}" Value="True">
+                            <Setter Property="HorizontalOptions" Value="End" />
+                            <Setter Property="BackgroundColor" Value="#0078D4" />
+                        </DataTrigger>
+                    </Frame.Triggers>
+                    <StackLayout>
+                        <Label Text="{Binding SenderName}" 
+                   FontSize="12" FontAttributes="Bold"
+                   TextColor="#0078D4" Margin="0,0,0,4" />
+                        <Label Text="{Binding Content}" 
+                   TextColor="White" />
+                        <Label Text="{Binding TimestampFormatted}" 
+                   FontSize="10" TextColor="#AAAAAA"
+                   HorizontalOptions="End" Margin="0,4,0,0" />
+                    </StackLayout>
+                </Frame>
+            </DataTemplate>
+
+            <!-- Photo Message Template -->
+            <DataTemplate x:Key="PhotoMessageTemplate" x:DataType="vm:PhotoMessageViewModel">
+                <Frame Style="{StaticResource MessageBubbleStyle}" MaximumWidthRequest="250">
+                    <StackLayout>
+                        <Label Text="{Binding SenderName}" 
+                   FontSize="12" FontAttributes="Bold"
+                   TextColor="#0078D4" Margin="0,0,0,8" />
+                        <Frame CornerRadius="8" Padding="0" HasShadow="False">
+                            <Image Source="{Binding ImageSource}" 
+                       MaximumHeightRequest="200" 
+                       Aspect="AspectFit" />
+                        </Frame>
+                        <Label Text="{Binding FileName}" 
+                   TextColor="White" Margin="0,8,0,0" />
+                        <Label Text="{Binding TimestampFormatted}" 
+                   FontSize="10" TextColor="#AAAAAA"
+                   HorizontalOptions="End" Margin="0,4,0,0" />
+                    </StackLayout>
+                </Frame>
+            </DataTemplate>
+
+            <!-- File Message Template -->
+            <DataTemplate x:Key="FileMessageTemplate" x:DataType="vm:FileMessageViewModel">
+                <Frame Style="{StaticResource MessageBubbleStyle}" MaximumWidthRequest="300">
+                    <StackLayout>
+                        <Label Text="{Binding SenderName}" 
+                   FontSize="12" FontAttributes="Bold"
+                   TextColor="#0078D4" Margin="0,0,0,8" />
+                        <Frame BackgroundColor="#3E3E42" CornerRadius="8" Padding="12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Column="0" Text="📄" FontSize="24" 
+                           VerticalOptions="Center" Margin="0,0,12,0" />
+
+                                <StackLayout Grid.Column="1">
+                                    <Label Text="{Binding FileName}" 
+                               TextColor="White" FontAttributes="Bold" />
+                                    <Label Text="{Binding FileSizeFormatted}" 
+                               TextColor="#AAAAAA" FontSize="12" />
+                                </StackLayout>
+
+                                <Button Grid.Column="2" Text="⬇" 
+                            BackgroundColor="#0078D4" TextColor="White"
+                            CornerRadius="16" WidthRequest="32" HeightRequest="32"
+                            Clicked="OnDownloadFile" />
+                            </Grid>
+                        </Frame>
+                        <Label Text="{Binding TimestampFormatted}" 
+                   FontSize="10" TextColor="#AAAAAA"
+                   HorizontalOptions="End" Margin="0,8,0,0" />
+                    </StackLayout>
+                </Frame>
+            </DataTemplate>
+
             <templates:MessageTemplateSelector x:Key="MessageTemplateSelector"
                 TextMessageTemplate="{StaticResource TextMessageTemplate}"
                 PhotoMessageTemplate="{StaticResource PhotoMessageTemplate}"
                 FileMessageTemplate="{StaticResource FileMessageTemplate}" />
-
+            
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -61,12 +140,9 @@
         <!-- Messages -->
         <CollectionView Grid.Row="1" x:Name="MessagesCollectionView"
                     ItemsSource="{Binding Messages}"
-                    ItemTemplate="{StaticResource MessageTemplateSelector}"
                     BackgroundColor="Transparent"
+                        ItemTemplate="{StaticResource MessageTemplateSelector}"
                     Margin="8,0">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
-            </CollectionView.ItemsLayout>
         </CollectionView>
 
         <!-- Input Area -->

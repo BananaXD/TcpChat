@@ -152,4 +152,10 @@ public partial class MainPage : ContentPage {
         await _chatClient?.DisconnectAsync();
         base.OnDisappearing();
     }
+
+    private async void OnDownloadFile(object sender, EventArgs e) {
+        if (sender is Button button && button.BindingContext is FileMessageViewModel viewModel) {
+            await viewModel.DownloadFile();
+        }
+    }
 }
