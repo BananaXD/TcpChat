@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup
+    x:Class="ChatMaui.Popups.InputPromptPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="False"
+    Color="Transparent">
+
+    <Frame
+        Margin="20"
+        Padding="20"
+        BackgroundColor="{AppThemeBinding Light=White, Dark=#2D2D30}"
+        BorderColor="{AppThemeBinding Light=LightGray, Dark=#3E3E42}"
+        CornerRadius="10"
+        HasShadow="True">
+        <VerticalStackLayout Spacing="15">
+            <Label
+                x:Name="TitleLabel"
+                FontAttributes="Bold"
+                FontSize="Large"
+                Text="ConnectionError" />
+            <Label
+                x:Name="MessageLabel"
+                Text="EnterIPAddress" />
+            <Entry
+                x:Name="InputEntry"
+                Placeholder="e.g., 192.168.1.100" />
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <Button
+                    Grid.Column="0"
+                    Clicked="OnCancelClicked"
+                    Text="Cancel" />
+                <Button
+                    Grid.Column="1"
+                    Clicked="OnConnectClicked"
+                    Text="Connect" />
+            </Grid>
+        </VerticalStackLayout>
+    </Frame>
+</toolkit:Popup>

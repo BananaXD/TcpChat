@@ -41,18 +41,36 @@ namespace ChatWpf
             _viewModel.IsConnected = e.IsConnected;
         }
 
-        private async Task StartChatClient()
-        {
-            try
-            {
-                _viewModel.ConnectionStatus = "Connecting...";
-                await _chatClient.ConnectAsync();
-            }
-            catch (Exception ex)
-            {
-                _viewModel.ConnectionStatus = "Connection Failed";
-                MessageBox.Show($"Failed to connect: {ex.Message}", "Connection Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+        private async Task StartChatClient() {
+            string? ipAddress = null; // Start with a default IP (or null)
+
+            while (!_viewModel.IsConnected) {
+                try {
+                    // Update status on the UI thread before attempting to connect
+                    var status = string.IsNullOrWhiteSpace(ipAddress)
+                        ? "Connecting..."
+                        : $"Connecting to {ipAddress}...";
+                    Dispatcher.Invoke(() => _viewModel.ConnectionStatus = status);
+
+                    // Pass the IP to ConnectAsync.
+                    // Assumes ChatClient.ConnectAsync is modified to accept an IP.
+                    await _chatClient.ConnectAsync(ipAddress);
+
+                    // If ConnectAsync succeeds, the loop will exit on the next check
+                    // because OnConnectionStatusChanged will set IsConnected to true.
+                } catch (Exception ex) {
+                    // Prompt user for a new IP address on the UI thread
+                    ipAddress = Dispatcher.Invoke(() => InputPrompt.Show(
+                        "Connection Error",
+                        $"Failed to connect. Please enter the server IP address:"
+                    ));
+
+                    // If the user cancels the prompt, stop trying
+                    if (string.IsNullOrWhiteSpace(ipAddress)) {
+                        Dispatcher.Invoke(() => _viewModel.ConnectionStatus = "Connection Canceled");
+                        break;
+                    }
+                }
             }
         }
 

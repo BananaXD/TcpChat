@@ -55,8 +55,11 @@ namespace Client {
             _serverPort = serverPort;
         }
 
-        public async Task ConnectAsync() {
+        public async Task ConnectAsync(string? serverHost = null) {
             try {
+                if (!string.IsNullOrEmpty(serverHost))
+                    _serverHost = serverHost;
+
                 _tcpClient = new TcpClient();
                 await _tcpClient.ConnectAsync(_serverHost, _serverPort);
                 _stream = _tcpClient.GetStream();

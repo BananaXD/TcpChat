@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
+using Microsoft.Extensions.Logging;
 
 namespace ChatMaui {
     public static class MauiProgram {
@@ -6,6 +8,7 @@ namespace ChatMaui {
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts => {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
@@ -15,6 +18,7 @@ namespace ChatMaui {
             builder.Logging.AddDebug();
 #endif
             
+            builder.Services.AddSingleton<IPopupService, PopupService>();
             builder.Services.AddSingleton<MainPage>();
 
             return builder.Build();

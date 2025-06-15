@@ -7,16 +7,21 @@ using System.Text.Json;
 using Client;
 using Microsoft.Extensions.Logging;
 using ChatMaui.ViewModels;
+using CommunityToolkit.Maui.Core;
+using ChatMaui.Popups;
+using CommunityToolkit.Maui.Views;
 
 namespace ChatMaui;
 public partial class MainPage : ContentPage {
     private readonly ChatClient _chatClient;
     private readonly ChatViewModel _viewModel;
     private readonly ILogger<MainPage> _logger;
+    private readonly IPopupService _popupService;
 
-    public MainPage(ILogger<MainPage> logger) {
+    public MainPage(ILogger<MainPage> logger, IPopupService popupService) {
         InitializeComponent();
         _logger = logger;
+        _popupService = popupService;
         _viewModel = new ChatViewModel();
         BindingContext = _viewModel;
 
@@ -36,12 +41,40 @@ public partial class MainPage : ContentPage {
     }
 
     private async Task StartChatClient() {
-        try {
-            _viewModel.ConnectionStatus = "Connecting...";
-            await _chatClient.ConnectAsync();
-        } catch (Exception ex) {
-            _viewModel.ConnectionStatus = "Connection Failed";
-            await DisplayAlert("Connection Error", $"Failed to connect: {ex.Message}", "OK");
+        string ipAddress = null; // Start with no IP, can be set to a default
+
+        while (!_viewModel.IsConnected) {
+            try {
+                // Update status before attempting to connect
+                var status = string.IsNullOrWhiteSpace(ipAddress)
+                    ? "Connecting..."
+                    : $"Connecting to {ipAddress}...";
+                MainThread.BeginInvokeOnMainThread(() => {
+                    _viewModel.ConnectionStatus = status;
+                });
+
+                // Pass the IP to ConnectAsync. A null value could mean "use default".
+                await _chatClient.ConnectAsync(ipAddress);
+
+                // If ConnectAsync completes without an exception, the loop will exit
+                // because OnConnectionStatusChanged will set IsConnected to true.
+
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Connection failed.");
+
+                // Use the custom popup instead of DisplayPromptAsync
+                var result = await this.ShowPopupAsync(new InputPromptPopup());
+
+                // The result is the object passed to the Close() method
+                ipAddress = result as string;
+
+                if (string.IsNullOrWhiteSpace(ipAddress)) {
+                    MainThread.BeginInvokeOnMainThread(() => {
+                        _viewModel.ConnectionStatus = "Connection Canceled";
+                    });
+                    break;
+                }
+            }
         }
     }
 
