@@ -16,7 +16,7 @@ namespace Server {
         private readonly ConcurrentDictionary<string, byte[]> _fileStorage;
         private readonly RSAKeyPair _serverEncryption; // Server's own encryption
         private bool _isRunning;
-        private const int PORT = 8888;
+        private const int PORT = 4933;
 
         public ChatServer() {
             _clients = new ConcurrentDictionary<string, ClientHandler>();
