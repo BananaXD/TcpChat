@@ -55,10 +55,7 @@ namespace EncryptionLibrary {
                 byte second = i + 1 < processedData.Count ? processedData[i + 1] : (byte)0;
 
                 var encryptedPair = EncryptPair(first, second);
-                if (i + 1 < processedData.Count)
-                    result.AddRange(encryptedPair);
-                else
-                    result.Add(encryptedPair[0]);
+                result.AddRange(encryptedPair);
             }
 
             return result.ToArray();

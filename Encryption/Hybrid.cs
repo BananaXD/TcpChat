@@ -36,7 +36,7 @@ namespace EncryptionLibrary {
             var key = Guid.NewGuid().ToString();
             var encryptedKey = RSAEncryption.Encrypt(key, publicKey);
 
-            return (XorEncryption.Encrypt(data, key), key);
+            return (XorEncryption.Encrypt(data, key), encryptedKey);
         }
         public static byte[] Decrypt(byte[] encryptedData, string encryptedKey, RSAKeyPair.PrivateKey privateKey) {
             var decryptedKey = RSAEncryption.Decrypt(encryptedKey, privateKey);

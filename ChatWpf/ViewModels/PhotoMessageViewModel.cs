@@ -46,13 +46,15 @@ namespace ChatWpf
                     bitmap.Freeze();
                     ImageSource = bitmap;
                 }
-                // Request download from server
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    if (Application.Current.MainWindow is MainWindow mainWindow) {
-                        mainWindow.RequestFileDownload(Message.Packet.MessageId);
-                    }
-                });
+                else {
+                    // Request download from server
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (Application.Current.MainWindow is MainWindow mainWindow) {
+                            mainWindow.RequestFileDownload(Message.Packet.MessageId);
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {

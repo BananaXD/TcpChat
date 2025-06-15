@@ -174,6 +174,8 @@ namespace Server {
             var decryptedContent = HybridEncryption.Decrypt(packet.Content, packet.EncryptedSessionKey, _server.ServerPrivateKey);
             var fileData = _server.GetFile(decryptedContent);
             if (fileData != null && PublicKey != null) {
+                Console.WriteLine($"{ClientId}: Requested File {decryptedContent}. Sending...");
+
                 // Encrypt file for this specific client
                 (var encryptedFileData, string key) = HybridEncryption.Encrypt(fileData, PublicKey);
                 var chunks = ChunkData(encryptedFileData, 4096);
@@ -190,6 +192,9 @@ namespace Server {
 
                     await SendMessageAsync(JsonSerializer.Serialize(response));
                 }
+            }
+            else {
+                Console.WriteLine($"{ClientId}: Requested File {decryptedContent}. 404 NOT FOUND.");
             }
         }
 
