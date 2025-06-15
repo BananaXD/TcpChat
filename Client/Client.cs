@@ -48,7 +48,7 @@ namespace Client {
         public bool IsConnected => _isConnected;
         public bool IsReady => _isConnected && _keyExchangeComplete;
 
-        public ChatClient(string serverHost = "localhost", int serverPort = 8888) {
+        public ChatClient(string serverHost = "localhost", int serverPort = 4933) {
             _downloadBuffer = new Dictionary<string, List<MessagePacket>>();
             _clientId = Environment.UserName + "_" + DateTime.Now.Ticks;
             _serverHost = serverHost;
