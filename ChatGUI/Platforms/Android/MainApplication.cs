@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace ChatGUI {
+namespace ChatMaui {
     [Application]
     public class MainApplication : MauiApplication {
         public MainApplication(IntPtr handle, JniHandleOwnership ownership)

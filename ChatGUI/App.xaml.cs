@@ -1,4 +1,4 @@
-﻿namespace ChatGUI {
+﻿namespace ChatMaui {
     public partial class App : Application {
         public App() {
             InitializeComponent();

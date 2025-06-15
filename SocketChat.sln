@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{DE7BFAA5-9039-4279-AA40-DEE5EEB0FF74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGUI", "ChatGUI\ChatGUI.csproj", "{24AF6535-15DC-46D9-9EB1-BEEDA4C3C7BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatMaui", "ChatGUI\ChatMaui.csproj", "{24AF6535-15DC-46D9-9EB1-BEEDA4C3C7BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatConsole", "ChatConsole\ChatConsole.csproj", "{7C58B691-F85F-4A50-A8DE-724224D690E1}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ChatGUI {
+namespace ChatMaui {
     public static class MauiProgram {
         public static MauiApp CreateMauiApp() {
             var builder = MauiApp.CreateBuilder();
@@ -12,8 +12,10 @@ namespace ChatGUI {
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
+            
+            builder.Services.AddSingleton<MainPage>();
 
             return builder.Build();
         }

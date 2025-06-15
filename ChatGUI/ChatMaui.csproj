@@ -68,4 +68,16 @@
 	  <ProjectReference Include="..\SharedModels\SharedModels.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Templates\MessageTemplates.xaml.cs">
+	    <DependentUpon>MessageTemplates.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Templates\MessageTemplates.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>
